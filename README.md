@@ -216,7 +216,85 @@ print("\nTop neighbors:")
 for rank, (idx, dist) in enumerate(zip(indices[0][1:6], distances[0][1:6]), 1):
     print(f"  {rank}. {labels[idx]:<25} (distance: {dist:.4f})")
 ```
+### Step 3 — Visualize the result
 
+```python
+import matplotlib.pyplot as plt
+
+def visualize_result(video_path, indices, distances, labels, features_dict,
+                     keyframes_root="UCF101_keyframes", top_k=5):
+
+    # --- Get a frame from the user's video --- #
+    cap = cv2.VideoCapture(video_path)
+    total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    cap.set(cv2.CAP_PROP_POS_FRAMES, total // 2)  # grab middle frame
+    ret, user_frame = cap.read()
+    cap.release()
+    user_frame = cv2.cvtColor(user_frame, cv2.COLOR_BGR2RGB)
+
+    # --- Get frames from the top matched neighbors --- #
+    neighbor_frames = []
+    neighbor_labels = []
+    neighbor_scores = []
+
+    for idx, dist in zip(indices[0][1:top_k+1], distances[0][1:top_k+1]):
+        vid_id = list(features_dict.keys())[idx]
+        label  = labels[idx]
+        score  = 1 - dist  # cosine similarity (higher = more similar)
+
+        frame_path = os.path.join(keyframes_root, label, vid_id)
+        frames = [f for f in os.listdir(frame_path) if f.endswith(".jpg")]
+
+        if frames:
+            img = cv2.imread(os.path.join(frame_path, random.choice(frames)))
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            neighbor_frames.append(img)
+            neighbor_labels.append(label)
+            neighbor_scores.append(score)
+
+    # --- Plot --- #
+    fig, axes = plt.subplots(1, top_k + 1, figsize=(18, 4))
+    fig.patch.set_facecolor("#1e1e1e")
+
+    # User's video on the left
+    axes[0].imshow(user_frame)
+    axes[0].set_title("YOUR VIDEO", color="white", fontsize=10, fontweight="bold", pad=8)
+    axes[0].axis("off")
+    for spine in axes[0].spines.values():
+        spine.set_edgecolor("#00ff88")
+        spine.set_linewidth(3)
+
+    # Predicted label as big text below user frame
+    predicted = max(set(neighbor_labels[:5]), key=neighbor_labels[:5].count)
+    fig.text(0.1, 0.02, f"Predicted: {predicted}", color="#00ff88",
+             fontsize=12, fontweight="bold", ha="center")
+
+    # Top matched neighbors on the right
+    for i, (frame, label, score) in enumerate(zip(neighbor_frames, neighbor_labels, neighbor_scores)):
+        axes[i + 1].imshow(frame)
+        axes[i + 1].set_title(f"#{i+1}  {label}\nSimilarity: {score:.2%}",
+                               color="white", fontsize=8, pad=6)
+        axes[i + 1].axis("off")
+
+    plt.suptitle("Top Matched Actions from Dataset", color="white",
+                 fontsize=13, fontweight="bold", y=1.02)
+    plt.tight_layout()
+    plt.savefig("my_result.png", dpi=200, bbox_inches="tight",
+                facecolor="#1e1e1e")
+    plt.show()
+    print("Result saved to my_result.png")
+
+# --- Call it after Step 2 --- #
+visualize_result(
+    video_path     = "my_video.mp4",
+    indices        = indices,
+    distances      = distances,
+    labels         = labels,
+    features_dict  = features_dict,
+    keyframes_root = "UCF101_keyframes"
+)
+```
+This will display your video frame alongside the top 5 matched neighbors from the dataset, with their action labels and similarity scores — so you can visually see what the model compared your video against and why it made its prediction.
 ### Important Notes
 
 - Your video must go through the **same R(2+1)D backbone** used during training — mixing backbones will produce incompatible vector sizes and garbage results

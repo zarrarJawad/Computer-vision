@@ -86,7 +86,7 @@ Full class list at [UCF-101 Homepage](https://www.crcv.ucf.edu/data/UCF101.php).
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/yourusername/ucf101-action-recognition.git
+git clone https://github.com/zarrarJawad/ucf101-action-recognition.git
 cd ucf101-action-recognition
 ```
 

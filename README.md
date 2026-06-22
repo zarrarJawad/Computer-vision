@@ -28,7 +28,7 @@ Selected per-class highlights:
 | IceDancing | 0.987 |
 | JumpRope | 0.990 |
 
-> Full per-class breakdown in full_report.txt
+> Full per-class breakdown in full_report
 
 ---
 

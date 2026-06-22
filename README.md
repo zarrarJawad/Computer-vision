@@ -106,7 +106,7 @@ pip install numpy scikit-learn opencv-python matplotlib torch torchvision
 
 ### [`ucf101_features_r2plus1d_2.pkl`](https://drive.google.com/file/d/1OpfKakz4ecs3e5Y2eH3cigJifll9LHBz/view?usp=sharing)
 
-> This file contains the pre-extracted R(2+1)D feature vectors for all 5,834 videos across 101 action classes. It is the core of the model — without it nothing will run.
+> This file contains the pre-extracted R(2+1)D feature vectors for all 5,834 videos across 101 action classes.
 
 **[👉 Click here to download from Google Drive](https://drive.google.com/file/d/1OpfKakz4ecs3e5Y2eH3cigJifll9LHBz/view?usp=sharing)**
 
